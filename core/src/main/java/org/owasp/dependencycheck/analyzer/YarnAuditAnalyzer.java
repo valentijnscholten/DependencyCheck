@@ -221,28 +221,33 @@ public class YarnAuditAnalyzer extends AbstractNpmAnalyzer {
             args.add("--verbose");
             final ProcessBuilder builder = new ProcessBuilder(args);
             builder.directory(folder);
-            LOGGER.debug("Launching: {}", args);
+            LOGGER.error("Launching: {}", args);
             final Process process = builder.start();
             try (ProcessReader processReader = new ProcessReader(process)) {
                 processReader.readAll();
                 final String errOutput = processReader.getError();
 
                 if (!StringUtils.isBlank(errOutput) && !EXPECTED_ERROR.equals(errOutput)) {
-                    LOGGER.debug("Process Error Out: {}", errOutput);
-                    LOGGER.debug("Process Out: {}", processReader.getOutput());
+                    LOGGER.error("Process Error Out: {}", errOutput);
+                    LOGGER.error("Process Out: {}", processReader.getOutput());
                 }
 
                 final String verboseJson = Arrays.stream(processReader.getOutput().split("\n"))
                         .filter(line -> line.contains("Audit Request"))
                         .findFirst().get();
                 String auditRequest;
+                LOGGER.error("----------------json------------");
+                //LOGGER.error(verboseJson);
                 try (JsonReader reader = Json.createReader(IOUtils.toInputStream(verboseJson, StandardCharsets.UTF_8))) {
+                    LOGGER.error("one");
                     final JsonObject jsonObject = reader.readObject();
+                    LOGGER.error("one");
                     auditRequest = jsonObject.getString("data");
+                    LOGGER.error("one");
                     //auditRequest = auditRequest.replace("Audit Request: ", "");
                     auditRequest = auditRequest.substring(15);
                 }
-                LOGGER.debug("Audit Request: {}", auditRequest);
+                LOGGER.error("Audit Request: {}", auditRequest);
 
                 return Json.createReader(IOUtils.toInputStream(auditRequest, StandardCharsets.UTF_8)).readObject();
             } catch (InterruptedException ex) {

@@ -30,7 +30,6 @@ import java.security.SecureRandom;
 import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
-import org.json.JSONObject;
 import org.owasp.dependencycheck.utils.Settings;
 import org.owasp.dependencycheck.utils.URLConnectionFactory;
 import org.slf4j.Logger;
@@ -177,7 +176,8 @@ public class NodeAuditSearch {
                 case 200:
                     try (InputStream in = new BufferedInputStream(conn.getInputStream());
                             JsonReader jsonReader = Json.createReader(in)) {
-                        final JSONObject jsonResponse = new JSONObject(jsonReader.readObject().toString());
+
+                        final JsonObject jsonResponse = jsonReader.readObject();
                         final NpmAuditParser parser = new NpmAuditParser();
                         final List<Advisory> advisories = parser.parse(jsonResponse);
                         if (cache != null) {

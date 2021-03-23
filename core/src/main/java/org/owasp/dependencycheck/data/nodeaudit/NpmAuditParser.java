@@ -17,8 +17,8 @@
  */
 package org.owasp.dependencycheck.data.nodeaudit;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
@@ -44,14 +44,14 @@ public class NpmAuditParser {
      * @param jsonResponse the JSON node to parse
      * @return an AdvisoryResults object
      */
-    public List<Advisory> parse(JSONObject jsonResponse) {
+    public List<Advisory> parse(JsonObject jsonResponse) {
         LOGGER.debug("Parsing JSON node");
         final List<Advisory> advisories = new ArrayList<>();
-        final JSONObject jsonAdvisories = jsonResponse.getJSONObject("advisories");
-        final Iterator<?> keys = jsonAdvisories.keys();
+        final JsonObject jsonAdvisories = jsonResponse.getJsonObject("advisories");
+        final Iterator<String> keys = jsonAdvisories.keySet().iterator();
         while (keys.hasNext()) {
-            final String key = (String) keys.next();
-            final Advisory advisory = parseAdvisory(jsonAdvisories.getJSONObject(key));
+            final String key = keys.next();
+            final Advisory advisory = parseAdvisory(jsonAdvisories.getJsonObject(key));
             advisories.add(advisory);
         }
         return advisories;
@@ -63,30 +63,30 @@ public class NpmAuditParser {
      * @param object the JSON object containing the advisory
      * @return the Advisory object
      */
-    private Advisory parseAdvisory(JSONObject object) {
+    private Advisory parseAdvisory(JsonObject object) {
         final Advisory advisory = new Advisory();
         advisory.setId(object.getInt("id"));
-        advisory.setOverview(object.optString("overview", null));
-        advisory.setReferences(object.optString("references", null));
-        advisory.setCreated(object.optString("created", null));
-        advisory.setUpdated(object.optString("updated", null));
-        advisory.setRecommendation(object.optString("recommendation", null));
-        advisory.setTitle(object.optString("title", null));
-        //advisory.setFoundBy(object.optString("author", null));
-        //advisory.setReportedBy(object.optString("author", null));
-        advisory.setModuleName(object.optString("module_name", null));
-        advisory.setVulnerableVersions(object.optString("vulnerable_versions", null));
-        advisory.setPatchedVersions(object.optString("patched_versions", null));
-        advisory.setAccess(object.optString("access", null));
-        advisory.setSeverity(object.optString("severity", null));
-        advisory.setCwe(object.optString("cwe", null));
+        advisory.setOverview(object.getString("overview", null));
+        advisory.setReferences(object.getString("references", null));
+        advisory.setCreated(object.getString("created", null));
+        advisory.setUpdated(object.getString("updated", null));
+        advisory.setRecommendation(object.getString("recommendation", null));
+        advisory.setTitle(object.getString("title", null));
+        //advisory.setFoundBy(object.getString("author", null));
+        //advisory.setReportedBy(object.getString("author", null));
+        advisory.setModuleName(object.getString("module_name", null));
+        advisory.setVulnerableVersions(object.getString("vulnerable_versions", null));
+        advisory.setPatchedVersions(object.getString("patched_versions", null));
+        advisory.setAccess(object.getString("access", null));
+        advisory.setSeverity(object.getString("severity", null));
+        advisory.setCwe(object.getString("cwe", null));
 
-        final JSONArray findings = object.optJSONArray("findings");
-        for (int i = 0; i < findings.length(); i++) {
-            final JSONObject finding = findings.getJSONObject(i);
-            final String version = finding.optString("version", null);
-            final JSONArray paths = finding.optJSONArray("paths");
-            for (int j = 0; j < paths.length(); j++) {
+        final JsonArray findings = object.getJsonArray("findings");
+        for (int i = 0; i < findings.size(); i++) {
+            final JsonObject finding = findings.getJsonObject(i);
+            final String version = finding.getString("version", null);
+            final JsonArray paths = finding.getJsonArray("paths");
+            for (int j = 0; j < paths.size(); j++) {
                 final String path = paths.getString(j);
                 if (path != null && path.equals(advisory.getModuleName())) {
                     advisory.setVersion(version);
@@ -94,10 +94,10 @@ public class NpmAuditParser {
             }
         }
 
-        final JSONArray jsonCves = object.optJSONArray("cves");
+        final JsonArray jsonCves = object.getJsonArray("cves");
         final List<String> stringCves = new ArrayList<>();
         if (jsonCves != null) {
-            for (int j = 0; j < jsonCves.length(); j++) {
+            for (int j = 0; j < jsonCves.size(); j++) {
                 stringCves.add(jsonCves.getString(j));
             }
             advisory.setCves(stringCves);

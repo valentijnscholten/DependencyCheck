@@ -254,8 +254,12 @@ Copyright (c) 2012 Jeremy Long. All Rights Reserved.
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-json_1.1_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
