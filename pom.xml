@@ -743,6 +743,7 @@ Copyright (c) 2012 - Jeremy Long
                     <failOnError>false</failOnError>
                     <bottom>Copyright© 2012-19 Jeremy Long. All Rights Reserved.</bottom>
                     <excludes>**/generated-sources/java/**/*.java</excludes>
+                    <source>8</source>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -1148,11 +1149,6 @@ Copyright (c) 2012 - Jeremy Long
                         <artifactId>httpcore</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>24.1.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>com.hankcs</groupId>

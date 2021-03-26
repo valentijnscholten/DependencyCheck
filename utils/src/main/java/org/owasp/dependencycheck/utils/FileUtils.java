@@ -23,13 +23,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -150,6 +153,23 @@ public final class FileUtils {
     }
 
     /**
+     * Returns the contents of the resource.
+     *
+     * @param resource the resource to read
+     * @return the contents of the resource
+     * @throws IOException thrown if the resource
+     */
+    public static String getResource(String resource) throws IOException {
+        String text = null;
+        try (InputStream in = getResourceAsStream(resource)) {
+            if (in != null) {
+                text = IOUtils.toString(in, StandardCharsets.UTF_8);
+            }
+        }
+        return text;
+    }
+
+    /**
      * Gets the {@link java.io.InputStream} for this resource.
      *
      * @param resource path
@@ -157,14 +177,21 @@ public final class FileUtils {
      */
     @Nullable
     public static InputStream getResourceAsStream(@NotNull String resource) {
-        final ClassLoader classLoader = FileUtils.class.getClassLoader();
-        final InputStream inputStream = classLoader != null
-                ? classLoader.getResourceAsStream(resource)
-                : ClassLoader.getSystemResourceAsStream(resource);
-
+        InputStream inputStream = null;
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader != null) {
+            inputStream = loader.getResourceAsStream(resource);
+        }
+        if (inputStream == null) {
+            loader = FileUtils.class.getClassLoader();
+            inputStream = loader.getResourceAsStream(resource);
+        }
+        if (inputStream == null) {
+            inputStream = ClassLoader.getSystemResourceAsStream(resource);
+        }
         if (inputStream == null) {
             try {
-                return new FileInputStream(resource);
+                inputStream = new FileInputStream(resource);
             } catch (final FileNotFoundException e) {
                 LOGGER.error("Unable to create an Input Stream for " + resource, e);
             }
@@ -180,20 +207,29 @@ public final class FileUtils {
      * @return the file reference for the resource
      */
     public static File getResourceAsFile(final String resource) {
-        final ClassLoader classLoader = FileUtils.class.getClassLoader();
-        String path = null;
-        if (classLoader != null) {
-            final URL url = classLoader.getResource(resource);
-            if (url != null) {
-                path = url.getFile();
+        URL url = null;
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader != null) {
+            url = loader.getResource(resource);
+        }
+        if (url == null) {
+            loader = FileUtils.class.getClassLoader();
+            url = loader.getResource(resource);
+        }
+        if (url == null) {
+            url = ClassLoader.getSystemResource(resource);
+        }
+        if (url == null) {
+            try {
+                File f = new File(resource);
+                if (f.isFile()) {
+                    url = f.toURI().toURL();
+                }
+            } catch (MalformedURLException ex) {
+                LOGGER.error("Unable to get resource: " + resource, ex);
             }
-        } else {
-            path = ClassLoader.getSystemResource(resource).getFile();
         }
-
-        if (path == null) {
-            return new File(resource);
-        }
-        return new File(path);
+        return url == null ? null : new File(url.getFile());
     }
+
 }

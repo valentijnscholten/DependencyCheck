@@ -17,12 +17,8 @@
  */
 package org.owasp.dependencycheck.data.nvdcve;
 
-import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -32,7 +28,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.annotation.concurrent.ThreadSafe;
 import org.anarres.jdiagnostics.DefaultQuery;
-import org.apache.commons.io.IOUtils;
 import org.owasp.dependencycheck.utils.DBUtils;
 import org.owasp.dependencycheck.utils.DependencyVersion;
 import org.owasp.dependencycheck.utils.DependencyVersionUtil;
@@ -320,7 +315,7 @@ public final class ConnectionFactory {
         LOGGER.debug("Creating database structure");
         final String dbStructure;
         try {
-            dbStructure = getResource(DB_STRUCTURE_RESOURCE);
+            dbStructure = FileUtils.getResource(DB_STRUCTURE_RESOURCE);
 
             Statement statement = null;
             try {
@@ -337,20 +332,6 @@ public final class ConnectionFactory {
         } catch (LinkageError ex) {
             LOGGER.debug(new DefaultQuery(ex).call().toString());
         }
-    }
-
-    private String getResource(String resource) throws IOException {
-        String dbStructure;
-        try {
-            final URL url = Resources.getResource(resource);
-            dbStructure = Resources.toString(url, StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException ex) {
-            LOGGER.debug("Resources.getResource(String) failed to find the DB Structure Resource", ex);
-            try (InputStream is = FileUtils.getResourceAsStream(resource)) {
-                dbStructure = IOUtils.toString(is, StandardCharsets.UTF_8);
-            }
-        }
-        return dbStructure;
     }
 
     /**
@@ -377,7 +358,7 @@ public final class ConnectionFactory {
                         + "purge command to remove the existing database");
             }
             try {
-                final String dbStructureUpdate = getResource(updateFile);
+                final String dbStructureUpdate = FileUtils.getResource(updateFile);
                 Statement statement = null;
                 try {
                     statement = conn.createStatement();
