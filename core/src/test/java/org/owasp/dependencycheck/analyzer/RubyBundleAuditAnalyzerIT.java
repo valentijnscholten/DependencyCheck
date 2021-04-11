@@ -17,12 +17,7 @@
  */
 package org.owasp.dependencycheck.analyzer;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -74,6 +69,9 @@ public class RubyBundleAuditAnalyzerIT extends BaseDBTestCase {
         getSettings().setBoolean(Settings.KEYS.AUTO_UPDATE, false);
         getSettings().setBoolean(Settings.KEYS.ANALYZER_NEXUS_ENABLED, false);
         getSettings().setBoolean(Settings.KEYS.ANALYZER_CENTRAL_ENABLED, false);
+        getSettings().setBoolean(Settings.KEYS.ANALYZER_CENTRAL_USE_CACHE, false);
+        getSettings().setBoolean(Settings.KEYS.ANALYZER_NODE_AUDIT_USE_CACHE, false);
+        getSettings().setBoolean(Settings.KEYS.ANALYZER_OSSINDEX_USE_CACHE, false);
         analyzer = new RubyBundleAuditAnalyzer();
         analyzer.initialize(getSettings());
         analyzer.setFilesMatched(true);
