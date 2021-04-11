@@ -228,27 +228,18 @@ public class YarnAuditAnalyzer extends AbstractNpmAnalyzer {
                 final String errOutput = processReader.getError();
 
                 if (!StringUtils.isBlank(errOutput) && !EXPECTED_ERROR.equals(errOutput)) {
-                    LOGGER.error("Process Error Out: {}", errOutput);
-                    LOGGER.error("Process Out: {}", processReader.getOutput());
+                    LOGGER.error("Yarn Error: {}", errOutput);
+                    LOGGER.debug("Yarn Process Output: {}", processReader.getOutput());
                 }
 
-                final String verboseJson = Arrays.stream(processReader.getOutput().split("\n"))
+                String verboseJson = Arrays.stream(processReader.getOutput().split("\n"))
                         .filter(line -> line.contains("Audit Request"))
                         .findFirst().get();
-                String auditRequest;
-                LOGGER.error("----------------json------------");
-                //LOGGER.error(verboseJson);
-                try (JsonReader reader = Json.createReader(IOUtils.toInputStream(verboseJson, StandardCharsets.UTF_8))) {
-                    LOGGER.error("one");
-                    final JsonObject jsonObject = reader.readObject();
-                    LOGGER.error("one");
-                    auditRequest = jsonObject.getString("data");
-                    LOGGER.error("one");
-                    //auditRequest = auditRequest.replace("Audit Request: ", "");
-                    auditRequest = auditRequest.substring(15);
-                }
-                LOGGER.error("Audit Request: {}", auditRequest);
-
+                final int start = verboseJson.indexOf("Audit Request:")+14;
+                final int end = verboseJson.lastIndexOf("\"");
+                final String auditRequest = verboseJson.substring(start,end).trim()
+                        .replace("\\n", "")
+                        .replace("\\\"", "\"");
                 return Json.createReader(IOUtils.toInputStream(auditRequest, StandardCharsets.UTF_8)).readObject();
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
