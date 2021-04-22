@@ -21,6 +21,7 @@ import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.owasp.dependencycheck.data.nexus.MavenArtifact;
 import org.owasp.dependencycheck.utils.Checksum;
 import org.slf4j.Logger;
@@ -33,7 +34,6 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,7 +54,7 @@ import org.owasp.dependencycheck.dependency.naming.PurlIdentifier;
  * @author Jeremy Long
  */
 @ThreadSafe
-public class Dependency extends EvidenceCollection implements Serializable {
+public class Dependency extends EvidenceCollection implements Serializable, Comparable<Dependency> {
 
     /**
      * The serial version UID for serialization.
@@ -91,19 +91,19 @@ public class Dependency extends EvidenceCollection implements Serializable {
     /**
      * A set of vulnerabilities that have been suppressed.
      */
-    private final Set<Vulnerability> suppressedVulnerabilities = new HashSet<>();
+    private final Set<Vulnerability> suppressedVulnerabilities = new TreeSet<>();
     /**
      * A list of vulnerabilities for this dependency.
      */
-    private final Set<Vulnerability> vulnerabilities = new HashSet<>();
+    private final Set<Vulnerability> vulnerabilities = new TreeSet<>();
     /**
      * A collection of related dependencies.
      */
-    private final Set<Dependency> relatedDependencies = new HashSet<>();
+    private final Set<Dependency> relatedDependencies = new TreeSet<>();
     /**
      * A list of projects that reference this dependency.
      */
-    private final Set<String> projectReferences = new HashSet<>();
+    private final Set<String> projectReferences = new TreeSet<>();
     /**
      * A list of available versions.
      */
@@ -741,7 +741,7 @@ public class Dependency extends EvidenceCollection implements Serializable {
      * @return the unmodifiable set of relatedDependencies
      */
     public synchronized Set<Dependency> getRelatedDependencies() {
-        return Collections.unmodifiableSet(new HashSet<>(relatedDependencies));
+        return Collections.unmodifiableSet(new TreeSet<>(relatedDependencies));
     }
 
     /**
@@ -750,7 +750,7 @@ public class Dependency extends EvidenceCollection implements Serializable {
      * @return the unmodifiable set of projectReferences
      */
     public synchronized Set<String> getProjectReferences() {
-        return Collections.unmodifiableSet(new HashSet<>(projectReferences));
+        return Collections.unmodifiableSet(new TreeSet<>(projectReferences));
     }
 
     /**
@@ -957,4 +957,18 @@ public class Dependency extends EvidenceCollection implements Serializable {
          */
         String hash(File file) throws IOException, NoSuchAlgorithmException;
     }
+
+
+        /**
+     * Implementation of the comparable interface.
+     *
+     * @param o the dependency being compared
+     * @return an integer indicating the ordering of the two objects
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public int compareTo(@NotNull Dependency o) {
+        return (o.getDisplayFileName() + o.getActualFilePath()).compareTo(this.getDisplayFileName() + this.getActualFilePath());
+    }
+
 }
