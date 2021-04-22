@@ -21,9 +21,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -316,7 +316,7 @@ public class App {
      * @return returns the set of identified files
      */
     private Set<File> scanAntStylePaths(List<String> antStylePaths, int symLinkDepth, String[] excludes) {
-        final Set<File> paths = new HashSet<>();
+        final Set<File> paths = new TreeSet<>();
         for (String file : antStylePaths) {
             LOGGER.debug("Scanning {}", file);
             final DirectoryScanner scanner = new DirectoryScanner();
