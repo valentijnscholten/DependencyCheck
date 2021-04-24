@@ -1,5 +1,5 @@
 #**
-This file is part of Dependency-Check. 
+This file is part of Dependency-Check.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ Copyright (c) 2018 Jeremy Long. All Rights Reserved.
 #if ($groupID)
         <groupID>$enc.xml($groupID)</groupID>
 #end
-#if ($artifactID)        
+#if ($artifactID)
         <artifactID>$enc.xml($artifactID)</artifactID>
 #end
 #if ($applicationVersion)
@@ -257,7 +257,7 @@ Copyright (c) 2018 Jeremy Long. All Rights Reserved.
 #end
                     </references>
                     <vulnerableSoftware>
-#foreach($vs in $vuln.getVulnerableSoftware())
+#foreach($vs in $vuln.getVulnerableSoftware(true))
                         <software#if($vs == $vuln.matchedVulnerableSoftware) vulnerabilityIdMatched="true"#end
                             #if($vs.versionStartIncluding) versionStartIncluding="$enc.xml($vs.versionStartIncluding)"#end
                             #if($vs.versionStartExcluding) versionStartExcluding="$enc.xml($vs.versionStartExcluding)"#end
@@ -337,7 +337,7 @@ Copyright (c) 2018 Jeremy Long. All Rights Reserved.
                             #if($vs.versionEndIncluding) versionEndIncluding="$enc.xml($vs.versionEndIncluding)"#end
                             #if($vs.versionEndExcluding) versionEndExcluding="$enc.xml($vs.versionEndExcluding)"#end
                             #if(!$vs.vulnerable) vulnerable="$vs.vulnerable"#end
-                        >$enc.xml($vs.toCpe23FS())</software>                            
+                        >$enc.xml($vs.toCpe23FS())</software>
 #end
                     </vulnerableSoftware>
                 </suppressedVulnerability>
