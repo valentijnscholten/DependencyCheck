@@ -191,9 +191,7 @@ public class CpeIdentifier implements Identifier {
         if (o instanceof CpeIdentifier) {
             final CpeIdentifier other = (CpeIdentifier) o;
             return new CompareToBuilder()
-                    .append(this.cpe, other.cpe)
-                    .append(this.url, other.getUrl())
-                    .append(this.confidence, other.getConfidence())
+                    .append(this.toString(), other.toString())
                     .toComparison();
 
         }

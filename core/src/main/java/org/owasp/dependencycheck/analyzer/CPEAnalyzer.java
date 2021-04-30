@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.concurrent.ThreadSafe;
@@ -797,7 +798,7 @@ public class CPEAnalyzer extends AbstractAnalyzer {
         final CpeBuilder cpeBuilder = new CpeBuilder();
 
         final Set<CpePlus> cpePlusEntries = cve.getCPEs(vendor, product);
-        final Set<Cpe> cpes = filterEcosystem(dependency.getEcosystem(), cpePlusEntries);
+        final Set<Cpe> cpes = new TreeSet<>(filterEcosystem(dependency.getEcosystem(), cpePlusEntries));
         if (cpes == null || cpes.isEmpty()) {
             return false;
         }
@@ -811,7 +812,7 @@ public class CPEAnalyzer extends AbstractAnalyzer {
         String bestGuessUpdate = null;
         Confidence bestGuessConf = null;
         String bestGuessURL = null;
-        final Set<IdentifierMatch> collected = new HashSet<>();
+        final Set<IdentifierMatch> collected = new TreeSet<>();
 
         if (dependency.getVersion() != null && !dependency.getVersion().isEmpty()) {
             //we shouldn't always use the dependency version - in some cases this causes FP

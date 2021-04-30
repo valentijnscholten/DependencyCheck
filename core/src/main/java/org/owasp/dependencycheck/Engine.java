@@ -544,6 +544,7 @@ public class Engine implements FileFilter, AutoCloseable {
                     for (Dependency existing : dependencies) {
                         if (sha1.equals(existing.getSha1sum())) {
                             if (existing.getFileName().contains(": ") || dependency.getFileName().contains(": ")) {
+                                LOGGER.warn("continue for {} and {}", dependency.getFileName(), existing.getFileName());
                                 //TODO this won't be quite right 100% of the time. Its possible that the ": " would get added later
                                 continue;
                             }
@@ -553,7 +554,8 @@ public class Engine implements FileFilter, AutoCloseable {
                             }
                             if (existing.getActualFilePath() != null && dependency.getActualFilePath() != null
                                     && !existing.getActualFilePath().equals(dependency.getActualFilePath())) {
-                                existing.addRelatedDependency(dependency);
+                                LOGGER.warn("adding {} as relatedDependancy to {}", dependency.getActualFilePath(), existing.getActualFilePath());
+                                        existing.addRelatedDependency(dependency);
                             } else {
                                 dependency = existing;
                             }
@@ -763,14 +765,14 @@ public class Engine implements FileFilter, AutoCloseable {
      * @return the executor service
      */
     protected ExecutorService getExecutorService(Analyzer analyzer) {
-        if (analyzer.supportsParallelProcessing()) {
-            final int maximumNumberOfThreads = Runtime.getRuntime().availableProcessors();
-            LOGGER.debug("Parallel processing with up to {} threads: {}.", maximumNumberOfThreads, analyzer.getName());
-            return Executors.newFixedThreadPool(maximumNumberOfThreads);
-        } else {
+        // if (analyzer.supportsParallelProcessing()) {
+        //     final int maximumNumberOfThreads = Runtime.getRuntime().availableProcessors();
+        //     LOGGER.debug("Parallel processing with up to {} threads: {}.", maximumNumberOfThreads, analyzer.getName());
+        //     return Executors.newFixedThreadPool(maximumNumberOfThreads);
+        // } else {
             LOGGER.debug("Parallel processing is not supported: {}.", analyzer.getName());
             return Executors.newSingleThreadExecutor();
-        }
+        // }
     }
 
     /**

@@ -24,6 +24,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.owasp.dependencycheck.Engine;
 import org.owasp.dependencycheck.analyzer.exception.AnalysisException;
 import org.owasp.dependencycheck.dependency.Dependency;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -40,6 +42,8 @@ import org.owasp.dependencycheck.dependency.Dependency;
  */
 @ThreadSafe
 public abstract class AbstractDependencyComparingAnalyzer extends AbstractAnalyzer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDependencyComparingAnalyzer.class);
 
     /**
      * a flag indicating if this analyzer has run. This analyzer only runs once.
@@ -91,6 +95,7 @@ public abstract class AbstractDependencyComparingAnalyzer extends AbstractAnalyz
             }
             Arrays.sort(dependencies, (l, r) -> (l.getDisplayFileName() + l.getActualFilePath()).compareTo(r.getDisplayFileName() + r.getActualFilePath()));
             for (int x = 0; x < dependencies.length - 1; x++) {
+                // LOGGER.info(dependencies[x].getDisplayFileName() + " | " + dependencies[x].getActualFilePath());
                 final Dependency dependency = dependencies[x];
                 if (!dependenciesToRemove.contains(dependency)) {
                     for (int y = x + 1; y < dependencies.length; y++) {
